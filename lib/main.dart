@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    openAI = OpenAI.instance.build(token: "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");
+    openAI = OpenAI.instance.build(token: "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");
     super.initState();
   }
 
@@ -61,33 +61,41 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget chatTile({required String msg,required String sender}) {
-    return Container(
-      color: Colors.greenAccent,
-      child: Row(children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(sender),
-            const SizedBox(height: 5,),
-            Text(msg)
-          ],
-        )
-      ],),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+            margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+                color: sender == "bot" ? Colors.blue : Colors.blueGrey,
+                shape: BoxShape.circle),
+            child: Center(
+                child: Text(sender[0].toUpperCase(),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)))),
+        Expanded(child: Text(msg, softWrap: true))
+      ],
     );
   }
 
   sendMessage({required String msg}){
     chats.insert(0, chatTile(msg: msg, sender: "user"));
     setState(() {
-      msgController.clear();
       getChatGPTData();
+      msgController.clear();
     });
   }
 
   getChatGPTData(){
-    var request = CompleteText(prompt: "What is flutter", model: kTranslateModelV3 , maxTokens: 200);
-    openAI!.onCompleteStream(request: request).listen((event) { 
-      print(event);
+    var request = CompleteText(prompt: msgController.text, model: kTranslateModelV3 , maxTokens: 200);
+    openAI!.onCompleteStream(request: request).listen((event) {
+      chats.insert(0, chatTile(msg: event!.choices[0].text, sender: "bot"));
+      chats.toSet().toList();
+      setState(() {});
     });
   }
 }
