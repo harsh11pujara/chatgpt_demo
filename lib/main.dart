@@ -28,7 +28,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     /// INSERT API KEY ///
-    openAI = OpenAI.instance.build(token: dotenv.env["API_KEY"], baseOption: HttpSetup(receiveTimeout: 60000));
+    //
+    openAI = OpenAI.instance.build(token:  dotenv.env["API_KEY"], baseOption: HttpSetup(receiveTimeout: 60000));
     getChatGPTData(question: "init");
     super.initState();
   }
